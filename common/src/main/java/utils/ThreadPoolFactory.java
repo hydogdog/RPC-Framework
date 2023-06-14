@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.*;
 
-
 public class ThreadPoolFactory {
     /**
      * 线程池参数
@@ -63,7 +62,6 @@ public class ThreadPoolFactory {
 
     /**
      * 创建 ThreadFactory 。如果threadNamePrefix不为空则使用自建ThreadFactory，否则使用defaultThreadFactory
-     *
      * @param threadNamePrefix 作为创建的线程名字的前缀
      * @param daemon           指定是否为 Daemon Thread(守护线程)
      * @return ThreadFactory

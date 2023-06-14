@@ -1,5 +1,6 @@
 package threadhandler;
 
+import container.ServiceContainer;
 import dto.RpcRequest;
 import dto.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -17,22 +18,41 @@ import java.net.Socket;
  */
 @Slf4j
 public class SocketRequestHandlerThread implements Runnable {
-    private final Socket accept;
-    private final Object service;
+    /**
+     * 服务Socket
+     */
+    private  Socket accept;
+    /**
+     * 服务容器
+     */
+    private ServiceContainer serviceContainer;
+    /**
+     * 请求处理器
+     */
+    private RequestHandler requestHandler;
 
-    public SocketRequestHandlerThread(Socket accept, Object service) {
+    public SocketRequestHandlerThread(Socket accept, ServiceContainer serviceContainer, RequestHandler requestHandler) {
         this.accept = accept;
-        this.service = service;
+        this.serviceContainer = serviceContainer;
+        this.requestHandler = requestHandler;
     }
 
     @Override
     public void run() {
         try(ObjectInputStream objectInputStream = new ObjectInputStream(accept.getInputStream());
+
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(accept.getOutputStream())){
+
             RpcRequest rpcRequest = (RpcRequest) objectInputStream.readObject();
-            Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes());
-            Object returnObject = method.invoke(service, rpcRequest.getParameters());
-            objectOutputStream.writeObject(RpcResponse.success(returnObject));
+
+            String interfaceName = rpcRequest.getInterfaceName();
+
+            Object service = serviceContainer.getService(interfaceName);
+
+            Object result = requestHandler.handle(rpcRequest,service);
+
+            objectOutputStream.writeObject(RpcResponse.success(result));
+
             objectOutputStream.flush();
 
         }catch (Exception e){

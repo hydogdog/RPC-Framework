@@ -8,8 +8,6 @@ import java.io.Serializable;
 @Data
 public class RpcResponse<T> implements Serializable {
 
-
-
     private Integer statusCode;
 
     private String message;
@@ -29,6 +27,4 @@ public class RpcResponse<T> implements Serializable {
         response.setMessage(code.getMessage());
         return response;
     }
-
-
 }

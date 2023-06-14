@@ -1,3 +1,4 @@
+import container.DefaultServiceContainer;
 import impl.HelloServiceImpl;
 import org.junit.Test;
 import server.SocketServer;
@@ -11,7 +12,10 @@ import server.SocketServer;
 public class testServer {
     @Test
     public void testSocketServer() throws Exception {
-        SocketServer socketServer = new SocketServer();
+        DefaultServiceContainer container = new DefaultServiceContainer();
+        HelloServiceImpl helloService = new HelloServiceImpl();
+        container.registry(helloService);
+        SocketServer socketServer = new SocketServer(container);
         socketServer.register(9999, new HelloServiceImpl());
     }
 

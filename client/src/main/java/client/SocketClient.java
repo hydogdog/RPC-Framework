@@ -12,6 +12,15 @@ import java.net.Socket;
 public class SocketClient implements RpcClient{
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
+    private String host;
+
+    private int port;
+
+
+    public SocketClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
     @Override
     public Object sendRequest(RpcRequest rpcRequest) {
         try (Socket socket = new Socket("127.0.0.1", 9999)) {
