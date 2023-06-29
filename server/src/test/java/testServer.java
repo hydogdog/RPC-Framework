@@ -1,6 +1,7 @@
 import container.DefaultServiceContainer;
 import impl.HelloServiceImpl;
 import org.junit.Test;
+import server.NettyServer;
 import server.SocketServer;
 
 /**
@@ -17,6 +18,15 @@ public class testServer {
         container.registry(helloService);
         SocketServer socketServer = new SocketServer(container);
         socketServer.register(9999, new HelloServiceImpl());
+    }
+
+    @Test
+    public void testNettyServer(){
+        HelloServiceImpl helloService = new HelloServiceImpl();
+        DefaultServiceContainer container = new DefaultServiceContainer();
+        container.registry(helloService);
+        NettyServer nettyServer = new NettyServer(9999);
+        nettyServer.start();
     }
 
 }

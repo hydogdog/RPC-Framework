@@ -17,11 +17,11 @@ public class DefaultServiceContainer implements ServiceContainer{
     /**
      * 用于存储已注册的服务
      */
-    private final Set<String> registeredService = ConcurrentHashMap.newKeySet();
+    private static final Set<String> registeredService = ConcurrentHashMap.newKeySet();
     /**
      * 用于存储服务的容器
      */
-    private final Map<String,Object> serviceMap = new ConcurrentHashMap<>();
+    private static final Map<String,Object> serviceMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> void registry(T service) {
