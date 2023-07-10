@@ -25,7 +25,7 @@ public class testClient {
 
     @Test
     public void testNettyClient(){
-        NettyClient nettyClient = new NettyClient("127.0.0.1", 9999);
+        NettyClient nettyClient = new NettyClient();
         RpcClientProxy rpcClientProxy = new RpcClientProxy(nettyClient);
         HelloService proxy = rpcClientProxy.getProxy(HelloService.class);
         String this_is_a_message = proxy.hello(new HelloObject(12, "this is a message"));

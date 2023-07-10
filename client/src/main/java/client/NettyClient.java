@@ -13,12 +13,18 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
+import registrycenter.ServiceRegistry;
+import registrycenter.impl.NacosServiceRegistry;
+import serializer.HessianSerializer;
 import serializer.JsonSerializer;
+import serializer.KryoSerializer;
 
+import java.net.InetSocketAddress;
 import java.util.Objects;
 
 
 /**
+ * @author hydogdog
  * @author hydogdog
  */
 @Slf4j
@@ -29,9 +35,10 @@ public class NettyClient implements RpcClient{
 
     private static final Bootstrap bootstrap;
 
-    public NettyClient(String host, int port) {
-        this.HOST = host;
-        this.PORT = port;
+    private ServiceRegistry serviceRegistry;
+
+    public NettyClient() {
+        serviceRegistry = new NacosServiceRegistry();
     }
 
     static {
@@ -45,7 +52,8 @@ public class NettyClient implements RpcClient{
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new CommonEncoder(new JsonSerializer()));
+                        //TODO 抽取Serializer字段，实现使用Set方法配置
+                        pipeline.addLast(new CommonEncoder(new HessianSerializer()));
                         pipeline.addLast(new CommonDecoder());
 
                         pipeline.addLast(new NettyClientHandler());
@@ -56,6 +64,9 @@ public class NettyClient implements RpcClient{
     @Override
     public Object sendRequest(RpcRequest rpcRequest) {
         try {
+            InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequest.getInterfaceName());
+            HOST = inetSocketAddress.getHostName();
+            PORT = inetSocketAddress.getPort();
             ChannelFuture future = bootstrap.connect(HOST, PORT).sync();
             Channel channel = future.channel();
             if(channel != null){

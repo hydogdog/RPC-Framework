@@ -1,3 +1,4 @@
+import api.entity.HelloService;
 import container.DefaultServiceContainer;
 import impl.HelloServiceImpl;
 import org.junit.Test;
@@ -23,10 +24,8 @@ public class testServer {
     @Test
     public void testNettyServer(){
         HelloServiceImpl helloService = new HelloServiceImpl();
-        DefaultServiceContainer container = new DefaultServiceContainer();
-        container.registry(helloService);
-        NettyServer nettyServer = new NettyServer(9999);
-        nettyServer.start();
+        NettyServer nettyServer = new NettyServer("127.0.0.1",9999);
+        nettyServer.publishService(helloService, HelloService.class);
     }
 
 }

@@ -2,6 +2,8 @@ package server;
 
 import coder.CommonDecoder;
 import coder.CommonEncoder;
+import container.DefaultServiceContainer;
+import container.ServiceContainer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,8 +12,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import registrycenter.ServiceRegistry;
+import registrycenter.impl.NacosServiceRegistry;
+import serializer.HessianSerializer;
 import serializer.JsonSerializer;
+import serializer.KryoSerializer;
 import threadhandler.NettyServerHandler;
+
+import java.net.InetSocketAddress;
 
 /**
  * @ClassName NettyServer
@@ -22,10 +30,19 @@ import threadhandler.NettyServerHandler;
 @Slf4j
 public class NettyServer implements RpcServer{
 
+    private String HOST;
+
     private int PORT;
 
-    public NettyServer(int port) {
+    protected ServiceContainer serviceContainer;
+
+    protected ServiceRegistry serviceRegistry;
+
+    public NettyServer(String host ,int port) {
+        this.HOST = host;
         this.PORT = port;
+        this.serviceRegistry = new NacosServiceRegistry();
+        this.serviceContainer = new DefaultServiceContainer();
     }
     @Override
     public void start() {
@@ -47,7 +64,7 @@ public class NettyServer implements RpcServer{
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
                             //编码器
-                            pipeline.addLast(new CommonEncoder(new JsonSerializer()));
+                            pipeline.addLast(new CommonEncoder(new HessianSerializer()));
                             //解码器
                             pipeline.addLast(new CommonDecoder());
                             //业务处理器
@@ -64,4 +81,13 @@ public class NettyServer implements RpcServer{
         }
 
     }
+
+    @Override
+    public <T> void publishService(Object service, Class<T> serviceClass) {
+        serviceContainer.registry(service);
+        serviceRegistry.registry(serviceClass.getCanonicalName(),new InetSocketAddress(HOST,PORT));
+        start();
+    }
+
+
 }

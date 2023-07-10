@@ -1,5 +1,7 @@
 package serializer;
 
+import javax.sql.rowset.serial.SerialException;
+
 /**
  * @author hydogdog
  */
@@ -22,7 +24,7 @@ public interface CommonSerializer {
      * @param clazz 要反序列化的类
      * @return 反序列化的对象
      */
-    Object deserialize(byte[] bytes, Class<?> clazz);
+    Object deserialize(byte[] bytes, Class<?> clazz) throws SerialException;
 
     /**
      * 获取序列化器的编号
@@ -37,8 +39,12 @@ public interface CommonSerializer {
      */
     static CommonSerializer getByCode(int code) {
         switch (code) {
+            case 0:
+                return new KryoSerializer();
             case 1:
                 return new JsonSerializer();
+            case 2:
+                return new HessianSerializer();
             default:
                 return null;
         }

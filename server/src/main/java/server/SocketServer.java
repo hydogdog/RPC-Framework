@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * @ClassName SocketServer
- * @Description TODO
+ * @Description Socket方式连接
  * @Author hydogdog
  * @Date 2023/5/23 16:54
  */
@@ -51,7 +51,7 @@ public class SocketServer {
 
             }
         }catch (IOException e){
-
+            log.error("服务器启动时有错误发生: ", e);
         }
     }
 }
